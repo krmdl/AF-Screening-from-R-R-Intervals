@@ -28,6 +28,24 @@ Thresholds were selected on the development set only (CV: 0.0836, MDR: 0.0448; d
 
 ![CV and MDR scores on the test set](fig1_scores.png)
 
+## Additional preliminary analyses (same 400 records, same detector and threshold rule)
+These were run locally after the main experiment. The analysis scripts and reports are not part of this repository yet; the numbers below come from those local reports.
+- **Repeated splits:** over 200 random 100+100 splits (thresholds re-selected on each development set), MDR had the higher test F1 in 200 of 200 splits (mean difference 0.073).
+- **Error analysis:** of the 66 CV false positives among the 100 Normal test records, 43 were records MDR classified correctly; most had a few very short R–R intervals (probable extra detected peaks) inside an otherwise regular rhythm.
+- **Simulated peak errors:** adding random extra/missed peaks to the R–R series (thresholds frozen from clean data) degraded CV much faster than MDR. This is a simulation, and the CV collapse is largely due to the frozen threshold.
+- **Signal-quality strata:** the MDR advantage did not grow with noise, so the hypothesis that MDR is more robust to peak errors is only weakly supported so far.
+- **Simple ML models** (logistic regression, random forest on five R–R features, trained on the development set only) reached test F1 of about 0.88, above MDR (0.826). They use CV and MDR as features, so this does not contradict MDR; it shows that extra features help.
+
+## Figures
+- `fig1_scores.png`: CV and MDR scores of the test records, with the thresholds selected on the development set.
+- `figures/fig2_simulated_peak_errors_clean_threshold.png`: **simulation.** Random extra/missed R peaks added to the R–R series of the test records; thresholds frozen from clean development data. F1 and specificity of CV and MDR versus error rate (mean ± std over 20 seeds).
+- `figures/fig3_simulated_peak_errors_retuned_threshold.png`: same simulation, with thresholds re-selected on development data corrupted in the same way.
+- `figures/fig4_record_A00222.png`, `fig4_record_A00223.png`, `fig4_record_A00261.png`, `fig4_record_A00303.png`, `fig4_record_A00314.png`: example Normal test records (R peaks marked, R–R series below). A00222, A00223 and A00303: CV false positive, MDR correct (A00303 and A00223 show short bursts of extra detected peaks). A00261: both correct (control). A00314: both wrong (extreme example). Plots only; no data files are included in this repository.
+
+## Planned work
+Independent validation on a second open database (MIT-BIH Atrial Fibrillation Database) with the thresholds frozen from the Challenge development set, record-level bootstrap confidence intervals, and a comparison of automatic and manually corrected beat annotations. Nothing from that database has been analysed yet.
+
 ## Limitations
 - No subject identifiers, so subject-level separation of development and test records cannot be guaranteed.
 - Results are for a 400-record subset and are not directly comparable with published results on other datasets or experiments.
+- The notebook's last cell (bootstrap and McNemar test) has not been run in Colab yet; the values above for the F1 difference and p-value come from an equivalent local run.
